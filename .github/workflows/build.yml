@@ -10,13 +10,13 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Download repository
+      - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Extract project ZIP
-        run: unzip -q fetchx-apk-project-output-buttons.zip -d project
+      - name: Extract FetchX project
+        run: unzip -q fetchx-apk-project-simple-output.zip -d project
 
-      - name: Set up Node
+      - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
           node-version: 20
@@ -35,9 +35,9 @@ jobs:
         working-directory: project
         run: npx cap add android
 
-      - name: Generate app icons
+      - name: Generate Android icons
         working-directory: project
-        run: npx capacitor-assets generate --android --iconBackgroundColor '#0a0a0a' --iconBackgroundColorDark '#0a0a0a'
+        run: npx capacitor-assets generate --android
 
       - name: Sync Capacitor
         working-directory: project
