@@ -1,0 +1,54 @@
+name: Build FetchX APK
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Download repository
+        uses: actions/checkout@v4
+
+      - name: Extract project ZIP
+        run: unzip -q fetchx-apk-project.zip -d project
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 17
+
+      - name: Install dependencies
+        working-directory: project
+        run: npm install
+
+      - name: Add Android platform
+        working-directory: project
+        run: npx cap add android
+
+      - name: Generate app icons
+        working-directory: project
+        run: npx capacitor-assets generate --android --iconBackgroundColor '#0a0a0a' --iconBackgroundColorDark '#0a0a0a'
+
+      - name: Sync Capacitor
+        working-directory: project
+        run: npx cap sync android
+
+      - name: Build APK
+        working-directory: project/android
+        run: ./gradlew assembleDebug
+
+      - name: Upload APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: FetchX-APK
+          path: project/android/app/build/outputs/apk/debug/app-debug.apk
